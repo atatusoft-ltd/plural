@@ -2,6 +2,8 @@
 
 namespace Atatusoft\Plural;
 
+use Atatusoft\Plural\Rules\RuleType;
+
 /**
  * Contains functions that may be used to pluralize words according to the
  * pluralization rules of a given language.
@@ -16,21 +18,21 @@ class Plural
      *
      * @var string
      */
-    const string VERSION = '0.3';
+    const string VERSION = '1.2.0';
 
     /**
      * An array of all rules that have been loaded, keyed by language code.
      *
      * @var array
      */
-    protected static array $_rules = [];
+    protected static array $rules = [];
 
     /**
      * The code of the language currently being used.
      *
      * @var string
      */
-    protected static string $_currentLanguage = '';
+    protected static string $currentLanguage = '';
 
     /**
      * Loads the language file for the language with the given language code
@@ -41,10 +43,12 @@ class Plural
      */
     public static function loadLanguage(string $language): bool
     {
-        if (!isset(self::$_rules[$language])) {
-            self::$_rules[$language] = [
-                'plural'        => [],
-                'irregular'     => []
+        if (!isset(self::$rules[$language])) {
+            self::$rules[$language] = [
+                RuleType::PLURAL->value             => [],
+                RuleType::IRREGULAR->value          => [],
+                RuleType::SINGULAR->value           => [],
+                RuleType::SINGULAR_IRREGULAR->value => [],
             ];
 
             $langFile = __DIR__ . "/Rules/$language.php";
@@ -58,14 +62,14 @@ class Plural
     }
 
     /**
-     * Sets the {@link Plural::$_currentLanguage current language code}.
+     * Sets the {@link Plural::$currentLanguage current language code}.
      *
      * @param string $language   The language code
      * @return  void
      */
     public static function setLanguage(string $language): void
     {
-        self::$_currentLanguage = $language;
+        self::$currentLanguage = $language;
     }
 
     /**
@@ -77,7 +81,7 @@ class Plural
      */
     public static function addRule(string $regex, string $replace): void
     {
-        self::$_rules[self::$_currentLanguage]['plural'][$regex] = $replace;
+        self::$rules[self::$currentLanguage][RuleType::PLURAL->value][$regex] = $replace;
     }
 
     /**
@@ -96,6 +100,33 @@ class Plural
     }
 
     /**
+     * Adds a singular rule to the internal array of plural rules.
+     *
+     * @param string $regex The regular expression to match
+     * @param string $replace The replacement string to use
+     * @return  void
+     */
+    public static function addSingularRule(string $regex, string $replace): void
+    {
+      self::$rules[self::$currentLanguage][RuleType::SINGULAR->value][$regex] = $replace;
+    }
+
+    /**
+     * Adds many singular rules at once. The $rules array should contain regular
+     * expression to replacement value pairs.
+     *
+     * @param array<string, string> $rules
+     * @return  void
+     * @see     Plural::addRule()
+     */
+    public static function addSingularRules(array $rules): void
+    {
+      foreach ($rules as $regex => $replace) {
+        self::addSingularRule($regex, $replace);
+      }
+    }
+
+    /**
      * Adds an irregular plural rule to the internal array of plural rules.
      *
      * @param string $singular   The singular form of the word
@@ -104,7 +135,7 @@ class Plural
      */
     public static function addIrregular(string $singular, string $plural): void
     {
-        self::$_rules[self::$_currentLanguage]['irregular'][$singular] = $plural;
+        self::$rules[self::$currentLanguage]['irregular'][$singular] = $plural;
     }
 
     /**
@@ -123,6 +154,33 @@ class Plural
     }
 
     /**
+     * Adds an irregular singular rule to the internal array of plural rules.
+     *
+     * @param string $regex The regular expression to match
+     * @param string $replace The replacement string to use
+     * @return  void
+     */
+    public static function addSingularIrregular(string $regex, string $replace): void
+    {
+      self::$rules[self::$currentLanguage][RuleType::SINGULAR_IRREGULAR->value][$regex] = $replace;
+    }
+
+    /**
+     * Adds many irregular singular rules at once. The $rules array should contain
+     * regular expression to replacement value pairs.
+     *
+     * @param array<string, string> $rules The rules to add
+     * @return  void
+     * @see     Plural::addIrregular()
+     */
+    public static function addSingularIrregulars(array $rules): void
+    {
+      foreach ($rules as $regex => $replace) {
+        self::addSingularIrregular($regex, $replace);
+      }
+    }
+
+    /**
      * Converts a singular noun to its plural form.
      *
      * @param string $word   The singular word
@@ -130,17 +188,17 @@ class Plural
      */
     public static function pluralize(string $word): string
     {
-        if (!isset(self::$_rules[self::$_currentLanguage])) {
+        if (!isset(self::$rules[self::$currentLanguage])) {
             return $word;
         }
 
         $word = trim($word);
-        $rules = self::$_rules[self::$_currentLanguage];
+        $rules = self::$rules[self::$currentLanguage];
 
-        if (isset($rules['irregular'][$word])) {
-            return $rules['irregular'][$word];
+        if (isset($rules[RuleType::IRREGULAR->value][$word])) {
+            return $rules[RuleType::IRREGULAR->value][$word];
         }
-        foreach ($rules['plural'] as $regex => $replace) {
+        foreach ($rules[RuleType::PLURAL->value] as $regex => $replace) {
             $word = preg_replace($regex, $replace, $word, 1, $count);
             if ($count) {
                 return $word;
@@ -150,4 +208,31 @@ class Plural
         return $word;
     }
 
+    /**
+     * Converts a plural noun to its singular form.
+     *
+     * @param string $word The plural word
+     * @return string The word singularized
+     */
+    public static function singularize(string $word): string
+    {
+      if (!isset(self::$rules[self::$currentLanguage])) {
+        return $word;
+      }
+
+      $word = trim($word);
+      $rules = self::$rules[self::$currentLanguage];
+
+      if (isset($rules[RuleType::SINGULAR_IRREGULAR->value][$word])) {
+        return $rules[RuleType::SINGULAR_IRREGULAR->value][$word];
+      }
+      foreach ($rules[RuleType::SINGULAR->value] as $regex => $replace) {
+        $word = preg_replace($regex, $replace, $word, 1, $count);
+        if ($count) {
+          return $word;
+        }
+      }
+
+      return $word;
+    }
 }
