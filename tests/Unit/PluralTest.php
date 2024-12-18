@@ -38,3 +38,35 @@ it('can change irregular singulars plural', function () {
     ->and(Plural::pluralize('fish'))->toEqual('fish')
     ->and(Plural::pluralize('species'))->toEqual('species');
 });
+
+# Singulars
+it('can change plurals singular', function () {
+  expect(Plural::singularize('matrices'))->toEqual('matrix')
+    ->and(Plural::singularize('quizzes'))->toEqual('quiz')
+    ->and(Plural::singularize('glasses'))->toEqual('glass')
+    ->and(Plural::singularize('matches'))->toEqual('match')
+    ->and(Plural::singularize('heroes'))->toEqual('hero')
+    ->and(Plural::singularize('cherries'))->toEqual('cherry')
+    ->and(Plural::singularize('diagnoses'))->toEqual('diagnosis')
+    ->and(Plural::singularize('mice'))->toEqual('mouse')
+    ->and(Plural::singularize('media'))->toEqual('medium')
+    ->and(Plural::singularize('knives'))->toEqual('knife')
+    ->and(Plural::singularize('shelves'))->toEqual('shelf')
+    ->and(Plural::singularize('syllabi'))->toEqual('syllabus')
+    ->and(Plural::singularize('octopi'))->toEqual('octopus')
+    ->and(Plural::singularize('axes'))->toEqual('axis')
+    ->and(Plural::singularize('dogs'))->toEqual('dog');
+});
+
+it('can change irregular plurals singular', function () {
+  expect(Plural::singularize('busses'))->toEqual('bus')
+    ->and(Plural::singularize('children'))->toEqual('child')
+    ->and(Plural::singularize('men'))->toEqual('man')
+    ->and(Plural::singularize('people'))->toEqual('person')
+    ->and(Plural::singularize('news'))->toEqual('news')
+    ->and(Plural::singularize('money'))->toEqual('money')
+    ->and(Plural::singularize('rice'))->toEqual('rice')
+    ->and(Plural::singularize('sheep'))->toEqual('sheep')
+    ->and(Plural::singularize('fish'))->toEqual('fish')
+    ->and(Plural::singularize('species'))->toEqual('species');
+});
