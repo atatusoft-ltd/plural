@@ -1,0 +1,32 @@
+{
+    "name": "atatusoft-ltd/plural",
+    "description": "Plural is a library that provides natural language pluralization functions for PHP.",
+    "type": "library",
+    "require-dev": {
+        "pestphp/pest": "^3.7",
+        "phpstan/phpstan": "*"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Atatusoft\\Plural\\": "src/"
+        },
+        "files": [
+            "src/Util/Functions.php"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Andrew Masiye",
+            "email": "amasiye313@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.3"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}

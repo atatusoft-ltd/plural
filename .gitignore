@@ -1,2 +1,9 @@
 *.swp
 .DS_Store
+
+/vendor/
+/.idea/
+/.vscode/
+.env
+*.log
+logs/*

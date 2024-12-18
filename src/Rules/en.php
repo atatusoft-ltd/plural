@@ -1,9 +1,11 @@
 <?php
 
+use Atatusoft\Plural\Plural;
+
 Plural::setLanguage(basename(__FILE__, '.php'));
 
 # each rule is a regular expression and its replacement
-Plural::addRules(array(
+Plural::addRules([
     '/(matr|vert|ind)(ix|ex)$/i'    => '\1ices',    # matrix, vertex, index
     '/(ss|sh|ch|x|z)$/i'            => '\1es',      # sibilant rule (no ending e)
     '/([^aeiou])o$/i'               => '\1oes',     # -oes rule
@@ -15,10 +17,10 @@ Plural::addRules(array(
     '/(octop|vir|syllab)us$/i'      => '\1i',       # octopus, virus, syllabus
     '/(ax|test)is$/i'               => '\1es',      # axis, testis
     '/([a-rt-z])$/i'                => '\1s'        # not ending in s
-));
+]);
 
 # words that don't follow any pluralization rules
-Plural::addIrregulars(array(
+Plural::addIrregulars([
     'bus'           => 'busses',
     'child'         => 'children',
     'man'           => 'men',
@@ -35,4 +37,4 @@ Plural::addIrregulars(array(
     'series'        => 'series',
     'sheep'         => 'sheep',
     'species'       => 'species'
-));
+]);
